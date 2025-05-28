@@ -37,7 +37,7 @@ fun EntryLineItem(entry: Entry) {
         }
 
         Text(
-            text = "${entry.amount}원",
+            text = "%,d원".format(entry.amount),
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
             color = amountColor
         )

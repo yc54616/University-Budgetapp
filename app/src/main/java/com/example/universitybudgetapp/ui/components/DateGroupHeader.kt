@@ -28,12 +28,12 @@ fun DateGroupHeader(date: String, income: Int, expense: Int) {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "+${income}원",
+                    text = "+%,d원".format(income),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.labelMedium
                 )
                 Text(
-                    text = "-${expense}원",
+                    text = "-%,d원".format(expense),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.labelMedium
                 )
