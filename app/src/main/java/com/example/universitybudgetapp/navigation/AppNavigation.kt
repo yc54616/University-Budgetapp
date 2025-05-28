@@ -16,7 +16,7 @@ fun AppNavigation(navController: NavHostController = rememberNavController()) {
         composable("home") { HomeScreenContent(navController) }
         composable("stats") { StatsScreen() }
         composable("settings") { SettingsScreen() }
-        composable("add_entry") { AddEntryScreen(navController = navController) }
+        composable( "add_entry") { AddEntryScreen(navController = navController) }
     }
 }
 
