@@ -33,7 +33,8 @@ fun BudgetTopBar(
     onNextClick: () -> Unit,
     onTitleClick: () -> Unit,    // ← 추가
     onEmailClick: () -> Unit,
-    showBadge: Boolean
+    showBadge: Boolean,
+    showEmailIcon: Boolean  // ← 새 플래그
 ) {
     TopAppBar(
         title = {
@@ -54,17 +55,23 @@ fun BudgetTopBar(
             IconButton(onClick = onNextClick) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "다음 달")
             }
-            IconButton(onClick = onEmailClick) {
-                Box {
-                    Icon(Icons.Default.Email, contentDescription = "메일")
-                    if (showBadge) {
-                        Box(
-                            Modifier
-                                .size(6.dp)
-                                .background(MaterialTheme.colorScheme.error, CircleShape)
-                                .align(Alignment.TopEnd)
-                                .offset(x = 1.dp, y = (-1).dp)
-                        )
+            // 🔥 showEmailIcon 이 true 일 때만 이메일 버튼 렌더링
+            if (showEmailIcon) {
+                IconButton(onClick = onEmailClick) {
+                    Box {
+                        Icon(Icons.Default.Email, contentDescription = "메일")
+                        if (showBadge) {
+                            Box(
+                                Modifier
+                                    .size(6.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.error,
+                                        shape = CircleShape
+                                    )
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = 1.dp, y = (-1).dp)
+                            )
+                        }
                     }
                 }
             }

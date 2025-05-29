@@ -37,12 +37,13 @@ fun BudgetApp() {
         topBar = {
             if (currentRoute != "add_entry") {
                 BudgetTopBar(
-                    title = currentYearMonth.format(monthFormatter),
-                    onPrevClick = { currentYearMonth = currentYearMonth.minusMonths(1) },
-                    onNextClick = { currentYearMonth = currentYearMonth.plusMonths(1) },
-                    onTitleClick = { showMonthPicker = true },
-                    onEmailClick = { /* TODO: 메일 화면 */ },
-                    showBadge = true
+                    title         = currentYearMonth.format(monthFormatter),
+                    onPrevClick   = { currentYearMonth = currentYearMonth.minusMonths(1) },
+                    onNextClick   = { currentYearMonth = currentYearMonth.plusMonths(1) },
+                    onTitleClick  = { showMonthPicker = true },
+                    onEmailClick  = { /* TODO */ },
+                    showBadge     = (currentRoute == "home"),
+                    showEmailIcon = (currentRoute == "home")  // 홈일 때만 이메일 아이콘 보이도록
                 )
             }
         },
