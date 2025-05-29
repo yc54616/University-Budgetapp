@@ -6,13 +6,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.universitybudgetapp.data.model.Entry
-import com.example.universitybudgetapp.data.model.Category
 
-// 🔧 색상 복원 유틸
 @Composable
 fun EntryLineItem(entry: Entry) {
     val amountColor = if (entry.isIncome)

@@ -1,9 +1,6 @@
 package com.example.universitybudgetapp.data.model
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.room.TypeConverter
 
 class CategoryConverter {

@@ -1,4 +1,3 @@
-// 파일: com/example/universitybudgetapp/data/model/DateConverter.kt
 package com.example.universitybudgetapp.data.model
 
 import androidx.room.TypeConverter

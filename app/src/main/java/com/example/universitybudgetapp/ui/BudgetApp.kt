@@ -20,7 +20,6 @@ import com.example.universitybudgetapp.ui.helpers.currentBackStackEntry
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetApp() {
     val navController = rememberNavController()
