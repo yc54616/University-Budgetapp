@@ -17,9 +17,16 @@ fun AppNavigation(
 ) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
-            HomeScreenContent(navController = navController,currentYearMonth  = currentYearMonth)
+            HomeScreenContent(
+                navController      = navController,
+                currentYearMonth   = currentYearMonth   // ← 넘겨주기
+            )
         }
-        composable("stats") { StatsScreen() }
+        composable("stats") {
+            StatsScreen(
+                currentYearMonth   = currentYearMonth   // ← 넘겨주기
+            )
+        }
         composable("settings") { SettingsScreen() }
         composable( "add_entry") { AddEntryScreen(navController = navController) }
     }
