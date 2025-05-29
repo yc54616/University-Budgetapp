@@ -1,7 +1,9 @@
+// 파일: com/example/universitybudgetapp/data/model/Entry.kt
 package com.example.universitybudgetapp.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDate
 
 @Entity(tableName = "entries")
 data class Entry(
@@ -9,9 +11,6 @@ data class Entry(
     val amount: Int,
     val description: String,
     val isIncome: Boolean,
-    val date: String,
-    val category: Category // ✅ 반드시 여기 있어야 함
+    val date: LocalDate,        // ✅ String → LocalDate
+    val category: Category      // ✅ CategoryConverter 이미 등록되어 있어야 함
 )
-
-
-

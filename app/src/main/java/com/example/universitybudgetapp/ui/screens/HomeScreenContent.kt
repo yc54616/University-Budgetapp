@@ -1,5 +1,7 @@
 package com.example.universitybudgetapp.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,22 +21,35 @@ import androidx.navigation.NavController
 import com.example.universitybudgetapp.ui.components.DateGroupHeader
 import com.example.universitybudgetapp.ui.components.EntryLineItem
 import com.example.universitybudgetapp.ui.components.SummaryHeader
+import java.time.YearMonth
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreenContent(
     navController: NavController,
+    currentYearMonth: YearMonth,
     viewModel: EntryViewModel = viewModel()
 ) {
     val entries by viewModel.entries.collectAsState()
 
-    if (entries.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("기록이 없습니다", style = MaterialTheme.typography.bodyMedium)
+    // 🔥 여기를 필터링
+    val filtered = entries.filter {
+        it.date.year == currentYearMonth.year &&
+                it.date.monthValue == currentYearMonth.monthValue
+    }
+
+    if (filtered.isEmpty()) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("기록이 없습니다")
         }
     } else {
-        val grouped = entries.sortedByDescending { it.date }.groupBy { it.date }
-        val incomeTotal = entries.filter { it.isIncome }.sumOf { it.amount }
-        val expenseTotal = entries.filter { !it.isIncome }.sumOf { it.amount }
+        // 기존대로 grouped, incomeTotal, expenseTotal 계산하되
+        // 항상 'filtered'를 쓰면 됩니다
+        val grouped = filtered
+            .sortedByDescending { it.date }
+            .groupBy { it.date }
+        val incomeTotal  = filtered.filter  { it.isIncome  }.sumOf { it.amount }
+        val expenseTotal = filtered.filter  { !it.isIncome }.sumOf { it.amount }
 
         LazyColumn(
             contentPadding = PaddingValues(
@@ -56,7 +71,7 @@ fun HomeScreenContent(
                 val dailyExpense = dailyEntries.filter { !it.isIncome }.sumOf { it.amount }
 
                 item {
-                    DateGroupHeader(date = date, income = dailyIncome, expense = dailyExpense)
+                    DateGroupHeader(date = date.toString(), income = dailyIncome, expense = dailyExpense)
                 }
 
                 items(dailyEntries) { entry ->

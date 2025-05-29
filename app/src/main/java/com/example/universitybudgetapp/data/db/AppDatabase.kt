@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.universitybudgetapp.data.model.CategoryConverter
+import com.example.universitybudgetapp.data.model.DateConverter
 import com.example.universitybudgetapp.data.model.Entry
 import com.example.universitybudgetapp.data.model.UserCategoryEntity
 
@@ -14,7 +15,10 @@ import com.example.universitybudgetapp.data.model.UserCategoryEntity
     version = 3,               // ← 스키마 변경시 반드시 올려야 합니다!
     exportSchema = false
 )
-@TypeConverters(CategoryConverter::class)  // ← 변환기 등록
+@TypeConverters(
+    CategoryConverter::class,  // 기존
+    DateConverter::class       // 추가
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun entryDao(): EntryDao
     abstract fun userCategoryDao(): UserCategoryDao

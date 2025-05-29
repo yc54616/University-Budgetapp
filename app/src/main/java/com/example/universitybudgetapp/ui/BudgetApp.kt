@@ -4,30 +4,46 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.universitybudgetapp.navigation.AppNavigation
-import com.example.universitybudgetapp.ui.components.*
+import com.example.universitybudgetapp.ui.components.BottomNavItem
+import com.example.universitybudgetapp.ui.components.BudgetBottomBar
+import com.example.universitybudgetapp.ui.components.BudgetTopBar
+import com.example.universitybudgetapp.ui.components.MonthPickerDialog
 import com.example.universitybudgetapp.ui.helpers.currentBackStackEntry
-import com.example.universitybudgetapp.ui.screens.HomeScreenContent
-import com.example.universitybudgetapp.ui.helpers.currentBackStackEntry
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetApp() {
-    var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }
     val navController = rememberNavController()
+    var selectedItem: BottomNavItem by remember { mutableStateOf(BottomNavItem.Home) }
+
+    // 현재 연·월 상태 관리
+    var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
+    val monthFormatter = remember { DateTimeFormatter.ofPattern("yyyy년 M월") }
+    var showMonthPicker by remember { mutableStateOf(false) }
+
     val currentRoute = currentBackStackEntry(navController)
 
     Scaffold(
         topBar = {
             if (currentRoute != "add_entry") {
-                BudgetTopBar(currentRoute = currentRoute)
+                BudgetTopBar(
+                    title = currentYearMonth.format(monthFormatter),
+                    onPrevClick = { currentYearMonth = currentYearMonth.minusMonths(1) },
+                    onNextClick = { currentYearMonth = currentYearMonth.plusMonths(1) },
+                    onTitleClick = { showMonthPicker = true },
+                    onEmailClick = { /* TODO: 메일 화면 */ },
+                    showBadge = true
+                )
             }
         },
         bottomBar = {
@@ -45,9 +61,7 @@ fun BudgetApp() {
         floatingActionButton = {
             if (currentRoute == "home") {
                 FloatingActionButton(onClick = {
-                    navController.navigate("add_entry") {
-                        launchSingleTop = true
-                    }
+                    navController.navigate("add_entry") { launchSingleTop = true }
                 }) {
                     Icon(Icons.Default.Add, contentDescription = "항목 추가")
                 }
@@ -55,10 +69,19 @@ fun BudgetApp() {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            AppNavigation(navController)
+            AppNavigation(navController, currentYearMonth)
         }
     }
 
+    // 월 선택 다이얼로그
+    if (showMonthPicker) {
+        MonthPickerDialog(
+            initialYearMonth = currentYearMonth,
+            onDismissRequest = { showMonthPicker = false },
+            onMonthSelected = {
+                currentYearMonth = it
+                showMonthPicker = false
+            }
+        )
+    }
 }
-
-
