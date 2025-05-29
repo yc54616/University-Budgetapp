@@ -1,7 +1,6 @@
 package com.example.universitybudgetapp.ui.screens
 
 import android.app.DatePickerDialog
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -14,8 +13,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.universitybudgetapp.data.db.AppDatabase
 import com.example.universitybudgetapp.data.model.Entry
+import com.example.universitybudgetapp.data.model.Category
+import com.example.universitybudgetapp.ui.components.CategorySelector
 import com.example.universitybudgetapp.viewmodel.EntryViewModel
+import com.example.universitybudgetapp.viewmodel.UserCategoryViewModel
+import com.example.universitybudgetapp.viewmodel.UserCategoryViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,6 +29,11 @@ fun AddEntryScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+    val dao = remember { AppDatabase.getInstance(context).userCategoryDao() }
+    val userCategoryViewModel: UserCategoryViewModel = viewModel(
+        factory = UserCategoryViewModelFactory(dao)
+    )
+
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
     val calendar = remember { Calendar.getInstance() }
 
@@ -32,6 +41,7 @@ fun AddEntryScreen(
     var description by remember { mutableStateOf("") }
     var isIncome by remember { mutableStateOf(true) }
     var selectedDate by remember { mutableStateOf(dateFormat.format(calendar.time)) }
+    var selectedCategory by remember { mutableStateOf<Category?>(null) }
 
     val datePickerDialog = remember {
         DatePickerDialog(
@@ -106,13 +116,23 @@ fun AddEntryScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ✅ 카테고리 선택 UI 추가
+        CategorySelector(
+            selected = selectedCategory ?: Category.기타,
+            onSelected = { selectedCategory = it },
+            userCategoryViewModel = userCategoryViewModel
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
             onClick = {
                 val entry = Entry(
                     amount = amount.toIntOrNull() ?: 0,
                     description = description,
                     isIncome = isIncome,
-                    date = selectedDate
+                    date = selectedDate,
+                    category = selectedCategory ?: Category.기타
                 )
                 viewModel.insertEntry(entry)
                 navController.popBackStack()

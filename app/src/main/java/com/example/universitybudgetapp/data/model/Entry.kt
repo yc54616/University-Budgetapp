@@ -9,7 +9,9 @@ data class Entry(
     val amount: Int,
     val description: String,
     val isIncome: Boolean,
-    val date: String // ✅ 날짜 추가
+    val date: String,
+    val category: Category // ✅ 반드시 여기 있어야 함
 )
+
 
 
