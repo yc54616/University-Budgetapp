@@ -20,14 +20,14 @@ import com.example.universitybudgetapp.ui.helpers.currentBackStackEntry
 
 @Composable
 fun BudgetApp() {
-    val navController = rememberNavController()
     var selectedItem by remember { mutableStateOf<BottomNavItem>(BottomNavItem.Home) }
+    val navController = rememberNavController()
+    val currentRoute = currentBackStackEntry(navController)
 
     Scaffold(
         topBar = {
-            val currentRoute = currentBackStackEntry(navController)
             if (currentRoute != "add_entry") {
-                BudgetTopBar()
+                BudgetTopBar(currentRoute = currentRoute)
             }
         },
         bottomBar = {
@@ -43,12 +43,14 @@ fun BudgetApp() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate("add_entry") {
-                    launchSingleTop = true
+            if (currentRoute == "home") {
+                FloatingActionButton(onClick = {
+                    navController.navigate("add_entry") {
+                        launchSingleTop = true
+                    }
+                }) {
+                    Icon(Icons.Default.Add, contentDescription = "항목 추가")
                 }
-            }) {
-                Icon(Icons.Default.Add, contentDescription = "항목 추가")
             }
         }
     ) { innerPadding ->
@@ -56,6 +58,7 @@ fun BudgetApp() {
             AppNavigation(navController)
         }
     }
+
 }
 
 
