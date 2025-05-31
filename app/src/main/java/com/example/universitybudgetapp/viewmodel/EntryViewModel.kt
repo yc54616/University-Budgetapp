@@ -22,6 +22,12 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
             dao.insert(entry)
         }
     }
+    // ✅ 전체 삭제 로직 추가
+    fun deleteAllEntries() {
+        viewModelScope.launch {
+            dao.deleteAll()
+        }
+    }
 }
 
 

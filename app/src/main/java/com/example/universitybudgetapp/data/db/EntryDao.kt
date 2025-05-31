@@ -11,6 +11,10 @@ interface EntryDao {
 
     @Query("SELECT * FROM entries ORDER BY id DESC")
     fun getAllEntries(): Flow<List<Entry>> // ✅ Flow 반환
+    // ✅ 전체 삭제 함수 추가
+    @Query("DELETE FROM entries")
+    suspend fun deleteAll()
+
 }
 
 
