@@ -96,7 +96,7 @@ fun StatsScreen(
                 Icon(
                     imageVector = category.icon,
                     contentDescription = category.name,
-                    tint = category.color,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -136,7 +136,7 @@ fun StatsScreen(
                 Icon(
                     imageVector = category.icon,
                     contentDescription = category.name,
-                    tint = category.color,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(Modifier.width(8.dp))

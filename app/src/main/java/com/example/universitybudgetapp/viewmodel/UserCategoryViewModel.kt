@@ -15,7 +15,7 @@ class UserCategoryViewModel(
     val userCategories = dao.getAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun addCategory(name: String, iconName: String) {
+    fun addCategory(name: String, iconName: String, type: String) { // 🔥 타입 추가
         val color = when (iconName) {
             "Restaurant" -> 0xFF42A5F5L
             "Movie" -> 0xFFAB47BCL
@@ -29,9 +29,11 @@ class UserCategoryViewModel(
                 UserCategoryEntity(
                     name = name,
                     iconName = iconName,
-                    color = color
+                    color = color,
+                    type = type // 🔥 DB에 저장
                 )
             )
         }
     }
 }
+

@@ -12,7 +12,7 @@ import com.example.universitybudgetapp.data.model.UserCategoryEntity
 
 @Database(
     entities = [Entry::class, UserCategoryEntity::class],
-    version = 4,               // ← 스키마 변경시 반드시 올려야 합니다!
+    version = 5,               // ← 스키마 변경시 반드시 올려야 합니다!
     exportSchema = false
 )
 @TypeConverters(

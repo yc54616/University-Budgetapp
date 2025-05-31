@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class UserCategoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
-    val iconName: String,   // ✅ 이 줄 추가
-    val color: Long         // ✅ color는 Color.value 저장용
+    val iconName: String,
+    val color: Long,
+    val type: String // 🔥 추가: 수입/지출 타입 (Category.Type.name)
 )

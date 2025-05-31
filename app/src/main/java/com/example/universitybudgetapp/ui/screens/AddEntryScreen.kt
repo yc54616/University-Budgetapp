@@ -58,6 +58,7 @@ fun AddEntryScreen(
     var isIncome by remember { mutableStateOf(true) }
     var selectedCategory by remember { mutableStateOf<Category>(Category.기타) }
 
+    var selectedType by remember { mutableStateOf(Category.Type.EXPENSE) }
     // 뒤로가기
     BackHandler { navController.popBackStack() }
 
@@ -95,14 +96,28 @@ fun AddEntryScreen(
 
         // 수입/지출 라디오
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("구분:")
-            Spacer(Modifier.width(8.dp))
-            RadioButton(selected = isIncome, onClick = { isIncome = true })
-            Text("수입")
-            Spacer(Modifier.width(8.dp))
-            RadioButton(selected = !isIncome, onClick = { isIncome = false })
-            Text("지출")
+            RadioButton(
+                selected = selectedType == Category.Type.INCOME,
+                onClick = { selectedType = Category.Type.INCOME }
+            )
+            Text(
+                text = "수입",
+                modifier = Modifier.padding(start = 4.dp)  // 🔥 간격 추가
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            RadioButton(
+                selected = selectedType == Category.Type.EXPENSE,
+                onClick = { selectedType = Category.Type.EXPENSE }
+            )
+            Text(
+                text = "지출",
+                modifier = Modifier.padding(start = 4.dp)  // 🔥 간격 추가
+            )
         }
+
+
         Spacer(Modifier.height(8.dp))
 
         // 날짜 선택
@@ -118,9 +133,12 @@ fun AddEntryScreen(
         // 카테고리 선택
         CategorySelector(
             selected = selectedCategory,
+            selectedType = selectedType, // 🔥 여기 중요!
             onSelected = { selectedCategory = it },
             userCategoryViewModel = userCategoryViewModel
         )
+
+
         Spacer(Modifier.height(16.dp))
 
         // 저장 버튼

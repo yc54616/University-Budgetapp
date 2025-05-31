@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.appcompat)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.extended)

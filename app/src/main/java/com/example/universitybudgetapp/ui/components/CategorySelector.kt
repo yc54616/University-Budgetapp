@@ -15,6 +15,7 @@ import com.example.universitybudgetapp.viewmodel.UserCategoryViewModel
 @Composable
 fun CategorySelector(
     selected: Category,
+    selectedType: Category.Type, // 🔥 수입/지출 타입 전달
     onSelected: (Category) -> Unit,
     userCategoryViewModel: UserCategoryViewModel = viewModel()
 ) {
@@ -31,29 +32,35 @@ fun CategorySelector(
         }
 
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            Category.defaultList().forEach {
-                DropdownMenuItem(
-                    text = { Text(it.name) },
-                    leadingIcon = {
-                        Icon(it.icon, contentDescription = it.name, tint = it.color)
-                    },
-                    onClick = {
-                        onSelected(it)
-                        expanded = false
-                    }
-                )
-            }
+            // 🔥 기본 카테고리 타입 필터링
+            Category.defaultList()
+                .filter { it.type == selectedType }
+                .forEach {
+                    DropdownMenuItem(
+                        text = { Text(it.name) },
+                        leadingIcon = {
+                            Icon(it.icon, contentDescription = it.name, tint = it.color)
+                        },
+                        onClick = {
+                            onSelected(it)
+                            expanded = false
+                        }
+                    )
+                }
 
-            if (userCategories.isNotEmpty()) {
+            // 🔥 사용자 카테고리 타입 필터링
+            val filteredUserCategories = userCategories.filter { it.type == selectedType.name }
+            if (filteredUserCategories.isNotEmpty()) {
                 Divider()
-                userCategories.forEach { entity ->
+                filteredUserCategories.forEach { entity ->
                     val icon = iconFromName(entity.iconName)
                     val color = Color(entity.color)
                     val customCategory = Category.Custom(
                         name = entity.name,
                         icon = icon,
                         color = color,
-                        iconName = entity.iconName
+                        iconName = entity.iconName,
+                        type = selectedType // 🔥 타입 정보 전달
                     )
                     DropdownMenuItem(
                         text = { Text(customCategory.name) },
@@ -83,7 +90,7 @@ fun CategorySelector(
         AddCategoryDialog(
             onDismiss = { showDialog = false },
             onConfirm = { name, iconName ->
-                userCategoryViewModel.addCategory(name, iconName)
+                userCategoryViewModel.addCategory(name, iconName, selectedType.name) // 🔥 타입 전달
                 val color = Color(
                     when (iconName) {
                         "Restaurant" -> 0xFF42A5F5L
@@ -98,7 +105,8 @@ fun CategorySelector(
                         name = name,
                         icon = Category.iconFromName(iconName),
                         color = color,
-                        iconName = iconName
+                        iconName = iconName,
+                        type = selectedType // 🔥 타입 전달
                     )
                 )
                 showDialog = false
@@ -106,3 +114,4 @@ fun CategorySelector(
         )
     }
 }
+
