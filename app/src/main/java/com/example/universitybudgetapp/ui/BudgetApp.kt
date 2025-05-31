@@ -21,11 +21,13 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun BudgetApp() {
+fun BudgetApp(
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
+) {
     val navController = rememberNavController()
     var selectedItem: BottomNavItem by remember { mutableStateOf(BottomNavItem.Home) }
 
-    // 현재 연·월 상태 관리
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
     val monthFormatter = remember { DateTimeFormatter.ofPattern("yyyy년 M월") }
     var showMonthPicker by remember { mutableStateOf(false) }
@@ -36,13 +38,13 @@ fun BudgetApp() {
         topBar = {
             if (currentRoute != "add_entry") {
                 BudgetTopBar(
-                    title         = currentYearMonth.format(monthFormatter),
-                    onPrevClick   = { currentYearMonth = currentYearMonth.minusMonths(1) },
-                    onNextClick   = { currentYearMonth = currentYearMonth.plusMonths(1) },
-                    onTitleClick  = { showMonthPicker = true },
-                    onEmailClick  = { /* TODO */ },
-                    showBadge     = (currentRoute == "home"),
-                    showEmailIcon = (currentRoute == "home")  // 홈일 때만 이메일 아이콘 보이도록
+                    title = currentYearMonth.format(monthFormatter),
+                    onPrevClick = { currentYearMonth = currentYearMonth.minusMonths(1) },
+                    onNextClick = { currentYearMonth = currentYearMonth.plusMonths(1) },
+                    onTitleClick = { showMonthPicker = true },
+                    onEmailClick = { /* TODO */ },
+                    showBadge = (currentRoute == "home"),
+                    showEmailIcon = (currentRoute == "home")
                 )
             }
         },
@@ -69,11 +71,15 @@ fun BudgetApp() {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            AppNavigation(navController, currentYearMonth)
+            AppNavigation(
+                navController = navController,
+                currentYearMonth = currentYearMonth,
+                isDarkTheme = isDarkTheme,
+                onThemeChange = onThemeChange
+            )
         }
     }
 
-    // 월 선택 다이얼로그
     if (showMonthPicker) {
         MonthPickerDialog(
             initialYearMonth = currentYearMonth,

@@ -13,7 +13,9 @@ import java.time.YearMonth
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    currentYearMonth: YearMonth
+    currentYearMonth: YearMonth,
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit
 ) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
@@ -27,7 +29,12 @@ fun AppNavigation(
                 currentYearMonth   = currentYearMonth   // ← 넘겨주기
             )
         }
-        composable("settings") { SettingsScreen() }
+        composable("settings") {
+            SettingsScreen(
+                isDarkTheme = isDarkTheme,
+                onThemeChange = onThemeChange
+            )
+        }
         composable( "add_entry") { AddEntryScreen(navController = navController) }
     }
 }
