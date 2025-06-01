@@ -22,12 +22,29 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
             dao.insert(entry)
         }
     }
+
+    fun updateEntry(entry: Entry) {
+        viewModelScope.launch {
+            dao.update(entry)
+        }
+    }
+
     // ✅ 전체 삭제 로직 추가
     fun deleteAllEntries() {
         viewModelScope.launch {
             dao.deleteAll()
         }
     }
+
+    // ID로 Entry 가져오기
+    fun getEntryById(id: Int?): Entry? {
+        return entries.value.find { it.id == id }
+    }
+
+    fun deleteEntry(entry: Entry) {
+        viewModelScope.launch {
+            dao.delete(entry)
+        }
+    }
+
 }
-
-

@@ -1,5 +1,6 @@
 package com.example.universitybudgetapp.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -65,6 +66,7 @@ fun NotificationListScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 OutlinedButton(onClick = {
+                                    Log.d("DEBUG", "추가 버튼 클릭됨: ${item.description}")
                                     val isIncome = item.type == "수입"
                                     val category = if (isIncome) Category.부수입 else Category.기타지출
                                     entryViewModel.insertEntry(

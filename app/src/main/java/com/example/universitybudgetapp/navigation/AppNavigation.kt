@@ -6,9 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.universitybudgetapp.ui.screens.HomeScreenContent
 import com.example.universitybudgetapp.ui.screens.AddEntryScreen
+import com.example.universitybudgetapp.ui.screens.EntryDetailScreen
 import com.example.universitybudgetapp.ui.screens.NotificationListScreen
 import com.example.universitybudgetapp.ui.screens.SettingsScreen
 import com.example.universitybudgetapp.ui.screens.StatsScreen
+import com.example.universitybudgetapp.viewmodel.EntryViewModel
 import com.example.universitybudgetapp.viewmodel.NotificationViewModel
 import java.time.YearMonth
 
@@ -18,6 +20,7 @@ fun AppNavigation(
     currentYearMonth: YearMonth,
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
+    entryViewModel: EntryViewModel,
     notificationViewModel: NotificationViewModel
 ) {
     NavHost(navController = navController, startDestination = "home") {
@@ -25,8 +28,40 @@ fun AppNavigation(
             HomeScreenContent(
                 navController = navController,
                 currentYearMonth = currentYearMonth,
+                entryViewModel = entryViewModel,
                 notificationViewModel = notificationViewModel
             )
+        }
+        composable("entry_detail/{entryId}") { backStackEntry ->
+            val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull()
+            val entry = entryViewModel.getEntryById(entryId)
+            entry?.let {
+                EntryDetailScreen(
+                    entry = it,
+                    onBack = { navController.popBackStack() },
+                    onEdit = {
+                        navController.navigate("edit_entry/${it.id}")
+                    },
+                    onDelete = {
+                        entryViewModel.deleteEntry(it)
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+        composable("edit_entry/{entryId}") { backStackEntry ->
+            val entryId = backStackEntry.arguments?.getString("entryId")?.toIntOrNull()
+            val entry = entryViewModel.getEntryById(entryId)
+            entry?.let {
+                AddEntryScreen(
+                    navController = navController,
+                    entryToEdit = it,
+                    onEntryEdited = { updatedEntry ->
+                        entryViewModel.updateEntry(updatedEntry)
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
         composable("stats") {
             StatsScreen(

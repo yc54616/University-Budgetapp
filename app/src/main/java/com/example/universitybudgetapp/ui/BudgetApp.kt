@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.universitybudgetapp.navigation.AppNavigation
 import com.example.universitybudgetapp.ui.components.BottomNavItem
@@ -20,6 +21,7 @@ import com.example.universitybudgetapp.ui.components.BudgetBottomBar
 import com.example.universitybudgetapp.ui.components.BudgetTopBar
 import com.example.universitybudgetapp.ui.components.MonthPickerDialog
 import com.example.universitybudgetapp.ui.helpers.currentBackStackEntry
+import com.example.universitybudgetapp.viewmodel.EntryViewModel
 import com.example.universitybudgetapp.viewmodel.NotificationViewModel
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -32,6 +34,7 @@ fun BudgetApp(
     notificationViewModel: NotificationViewModel  // 🔥 추가
 ) {
     val navController = rememberNavController()
+    val entryViewModel: EntryViewModel = viewModel()
     var selectedItem: BottomNavItem by remember { mutableStateOf(BottomNavItem.Home) }
     var currentYearMonth by remember { mutableStateOf(YearMonth.now()) }
     val monthFormatter = remember { DateTimeFormatter.ofPattern("yyyy년 M월") }
@@ -112,8 +115,10 @@ fun BudgetApp(
                 currentYearMonth = currentYearMonth,
                 isDarkTheme = isDarkTheme,
                 onThemeChange = onThemeChange,
-                notificationViewModel = notificationViewModel  // 🔥 전달
+                notificationViewModel = notificationViewModel,
+                entryViewModel = entryViewModel   // ✅ 이 부분 추가
             )
+
         }
     }
 

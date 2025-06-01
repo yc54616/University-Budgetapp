@@ -32,6 +32,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AddEntryScreen(
     navController: NavController,
+    entryToEdit: Entry? = null,
+    onEntryEdited: ((Entry) -> Unit)? = null,
     viewModel: EntryViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -55,10 +57,17 @@ fun AddEntryScreen(
         )
     }
 
-    var amount by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedCategory by remember { mutableStateOf<Category>(Category.기타지출) }
-    var selectedType by remember { mutableStateOf(Category.Type.EXPENSE) }
+    var amount by remember { mutableStateOf(entryToEdit?.amount?.toString() ?: "") }
+    var description by remember { mutableStateOf(entryToEdit?.description ?: "") }
+    var selectedCategory by remember {
+        mutableStateOf(entryToEdit?.category ?: Category.기타지출)
+    }
+    var selectedType by remember {
+        mutableStateOf(
+            entryToEdit?.let { if (it.isIncome) Category.Type.INCOME else Category.Type.EXPENSE }
+                ?: Category.Type.EXPENSE
+        )
+    }
 
     var showKeypad by remember { mutableStateOf(false) }
 
@@ -147,22 +156,26 @@ fun AddEntryScreen(
         Button(
             onClick = {
                 val isIncome = selectedType == Category.Type.INCOME
-                viewModel.insertEntry(
-                    Entry(
-                        amount = amount.toLongOrNull() ?: 0L,
-                        description = description,
-                        isIncome = isIncome,
-                        date = selectedDate,
-                        category = selectedCategory
-                    )
+                val newEntry = Entry(
+                    id = entryToEdit?.id ?: 0,  // 수정 모드일 경우 기존 id 유지
+                    amount = amount.toLongOrNull() ?: 0L,
+                    description = description,
+                    isIncome = isIncome,
+                    date = selectedDate,
+                    category = selectedCategory
                 )
+                if (entryToEdit != null && onEntryEdited != null) {
+                    onEntryEdited(newEntry)
+                } else {
+                    viewModel.insertEntry(newEntry)
+                }
                 navController.popBackStack()
             },
             modifier = Modifier.align(Alignment.Start)
         ) {
             Icon(Icons.Default.Add, contentDescription = "저장")
             Spacer(Modifier.width(4.dp))
-            Text("저장")
+            Text(if (entryToEdit != null) "수정" else "저장")
         }
 
         Spacer(Modifier.height(16.dp))
@@ -215,8 +228,8 @@ fun CustomKeypad(
                             .weight(1f)
                             .padding(horizontal = 4.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurface
                         )
                     ) {
                         Text(

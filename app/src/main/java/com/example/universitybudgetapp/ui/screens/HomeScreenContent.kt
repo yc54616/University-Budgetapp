@@ -68,6 +68,8 @@ fun HomeScreenContent(
         val incomeTotal = filtered.filter { it.isIncome }.sumOf { it.amount }
         val expenseTotal = filtered.filter { !it.isIncome }.sumOf { it.amount }
 
+        var isNavigating by remember { mutableStateOf(false) }
+
         LazyColumn(
             contentPadding = PaddingValues(
                 top = 16.dp,
@@ -94,8 +96,20 @@ fun HomeScreenContent(
                 }
 
                 items(dailyEntries) { entry ->
-                    EntryLineItem(entry)
+                    EntryLineItem(
+                        entry = entry,
+                        onClick = {
+                            if (!isNavigating) {
+                                isNavigating = true
+                                navController.navigate("entry_detail/${entry.id}") {
+                                    launchSingleTop = true
+                                }
+                                // Optionally: Delay나 Effect로 isNavigating 초기화 가능
+                            }
+                        }
+                    )
                 }
+
             }
         }
     }
@@ -104,19 +118,6 @@ fun HomeScreenContent(
         NotificationSummaryDialog(
             count = notifications.size,
             onConfirm = {
-                notifications.forEach { item ->
-                    val isIncome = item.type == "수입"
-                    val category = if (isIncome) Category.부수입 else Category.기타지출
-                    entryViewModel.insertEntry(
-                        Entry(
-                            amount = item.amount,
-                            description = item.description,
-                            isIncome = isIncome,
-                            date = LocalDate.now(),
-                            category = category
-                        )
-                    )
-                }
                 notificationViewModel.hideDialog()
                 navController.navigate("notification_list")
             },
