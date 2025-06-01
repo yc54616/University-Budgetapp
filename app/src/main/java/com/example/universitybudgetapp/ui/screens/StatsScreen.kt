@@ -18,12 +18,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.universitybudgetapp.viewmodel.EntryViewModel
 import com.example.universitybudgetapp.data.model.Category
+import com.example.universitybudgetapp.viewmodel.NotificationViewModel
 import java.time.YearMonth
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatsScreen(
     currentYearMonth: YearMonth,
+    notificationViewModel: NotificationViewModel,
     viewModel: EntryViewModel = viewModel()
 ) {
     val entries by viewModel.entries.collectAsState()

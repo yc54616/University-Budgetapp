@@ -25,18 +25,20 @@ fun AppNavigation(
             HomeScreenContent(
                 navController = navController,
                 currentYearMonth = currentYearMonth,
-                notificationViewModel = notificationViewModel  // 여기서 전달
+                notificationViewModel = notificationViewModel
             )
         }
         composable("stats") {
             StatsScreen(
-                currentYearMonth = currentYearMonth
+                currentYearMonth = currentYearMonth,
+                notificationViewModel = notificationViewModel
             )
         }
         composable("settings") {
             SettingsScreen(
                 isDarkTheme = isDarkTheme,
-                onThemeChange = onThemeChange
+                onThemeChange = onThemeChange,
+                notificationViewModel = notificationViewModel
             )
         }
         composable("add_entry") {
@@ -50,6 +52,7 @@ fun AppNavigation(
         }
     }
 }
+
 
 
 

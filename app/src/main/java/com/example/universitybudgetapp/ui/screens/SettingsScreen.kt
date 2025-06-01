@@ -8,12 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.universitybudgetapp.viewmodel.EntryViewModel
+import com.example.universitybudgetapp.viewmodel.NotificationViewModel
 
 @Composable
 fun SettingsScreen(
+    notificationViewModel: NotificationViewModel,      // ✅ 추가!
     viewModel: EntryViewModel = viewModel(),
-    onThemeChange: (Boolean) -> Unit = {},   // 다크모드 토글 콜백 (예시)
-    isDarkTheme: Boolean = false             // 다크모드 상태 (예시)
+    onThemeChange: (Boolean) -> Unit = {},             // 다크모드 토글 콜백
+    isDarkTheme: Boolean = false            // 다크모드 상태 (예시)
 ) {
     var currency by remember { mutableStateOf("₩ KRW") }
     val appVersion = "1.0.0"  // 실제 앱 버전은 BuildConfig.VERSION_NAME 등에서 가져오세요

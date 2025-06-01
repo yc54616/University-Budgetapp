@@ -23,6 +23,7 @@ import com.example.universitybudgetapp.ui.components.NotificationDialog
 import java.time.LocalDate
 import java.time.YearMonth
 import com.example.universitybudgetapp.data.model.NotificationItem
+import com.example.universitybudgetapp.ui.components.NotificationSummaryDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -36,10 +37,17 @@ fun HomeScreenContent(
     val entries by entryViewModel.entries.collectAsState()
     val notifications by notificationViewModel.notifications.collectAsState()
 
-    var showDialog by remember { mutableStateOf(false) }
-
     // 🔥 TopBar가 제거되어 별도의 알림 버튼이 없는 상태
     // 만약 이메일 아이콘 클릭 시 showDialog = true로 열고 싶다면 상단에서 버튼을 추가해 주세요.
+
+    val showDialog = notificationViewModel.showDialog
+
+    LaunchedEffect(notifications) {
+        if (notifications.isNotEmpty() && !notificationViewModel.alreadyDismissed) {
+            notificationViewModel.showDialog()
+        }
+    }
+
 
     val filtered = entries.filter {
         it.date.year == currentYearMonth.year &&
@@ -93,24 +101,32 @@ fun HomeScreenContent(
     }
 
     if (showDialog) {
-        NotificationDialog(
-            notifications = notifications,
-            onAdd = { item ->
-                entryViewModel.insertEntry(
-                    Entry(
-                        amount = item.amount,
-                        description = item.description,
-                        isIncome = true,
-                        date = LocalDate.now(),
-                        category = Category.부수입
+        NotificationSummaryDialog(
+            count = notifications.size,
+            onConfirm = {
+                notifications.forEach { item ->
+                    val isIncome = item.type == "수입"
+                    val category = if (isIncome) Category.부수입 else Category.기타지출
+                    entryViewModel.insertEntry(
+                        Entry(
+                            amount = item.amount,
+                            description = item.description,
+                            isIncome = isIncome,
+                            date = LocalDate.now(),
+                            category = category
+                        )
                     )
-                )
-                notificationViewModel.removeNotification(item)
+                }
+                notificationViewModel.hideDialog()
+                navController.navigate("notification_list")
             },
-            onDelete = { item: NotificationItem ->
-                notificationViewModel.removeNotification(item)
-            },
-            onDismiss = { showDialog = false }
+            onDismiss = {
+                notificationViewModel.hideDialog()
+                notificationViewModel.markDialogDismissed()
+            }
         )
     }
+
+
+
 }
