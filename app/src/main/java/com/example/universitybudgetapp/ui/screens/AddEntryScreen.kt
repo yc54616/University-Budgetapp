@@ -43,7 +43,6 @@ fun AddEntryScreen(
         DatePickerDialog(
             context,
             { _, year, month, day ->
-                // month는 0-based 이므로 +1
                 selectedDate = LocalDate.of(year, month + 1, day)
             },
             selectedDate.year,
@@ -55,8 +54,9 @@ fun AddEntryScreen(
     // 입력 필드 상태
     var amount by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var isIncome by remember { mutableStateOf(true) }
-    var selectedCategory by remember { mutableStateOf<Category>(Category.기타) }
+    var selectedCategory by remember { mutableStateOf<Category>(Category.기타지출) }
+
+    var selectedType by remember { mutableStateOf(Category.Type.EXPENSE) }
 
     // 뒤로가기
     BackHandler { navController.popBackStack() }
@@ -95,14 +95,27 @@ fun AddEntryScreen(
 
         // 수입/지출 라디오
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("구분:")
-            Spacer(Modifier.width(8.dp))
-            RadioButton(selected = isIncome, onClick = { isIncome = true })
-            Text("수입")
-            Spacer(Modifier.width(8.dp))
-            RadioButton(selected = !isIncome, onClick = { isIncome = false })
-            Text("지출")
+            RadioButton(
+                selected = selectedType == Category.Type.INCOME,
+                onClick = { selectedType = Category.Type.INCOME }
+            )
+            Text(
+                text = "수입",
+                modifier = Modifier.padding(start = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            RadioButton(
+                selected = selectedType == Category.Type.EXPENSE,
+                onClick = { selectedType = Category.Type.EXPENSE }
+            )
+            Text(
+                text = "지출",
+                modifier = Modifier.padding(start = 4.dp)
+            )
         }
+
         Spacer(Modifier.height(8.dp))
 
         // 날짜 선택
@@ -118,17 +131,20 @@ fun AddEntryScreen(
         // 카테고리 선택
         CategorySelector(
             selected = selectedCategory,
+            selectedType = selectedType,
             onSelected = { selectedCategory = it },
             userCategoryViewModel = userCategoryViewModel
         )
+
         Spacer(Modifier.height(16.dp))
 
         // 저장 버튼
         Button(
             onClick = {
+                val isIncome = selectedType == Category.Type.INCOME
                 viewModel.insertEntry(
                     Entry(
-                        amount      = amount.toIntOrNull() ?: 0,
+                        amount      = amount.toLongOrNull() ?: 0L,
                         description = description,
                         isIncome    = isIncome,
                         date        = selectedDate,

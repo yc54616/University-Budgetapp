@@ -43,12 +43,12 @@ fun StatsScreen(
     val totalExpense = expenseEntries.sumOf { it.amount }
 
     // 카테고리별 통계
-    val incomeStats: List<Pair<Category, Int>> =
+    val incomeStats: List<Pair<Category, Long>> =
         incomeEntries.groupBy { it.category }
             .map { (cat, list) -> cat to list.sumOf { it.amount } }
             .sortedByDescending { it.second }
 
-    val expenseStats: List<Pair<Category, Int>> =
+    val expenseStats: List<Pair<Category, Long>> =
         expenseEntries.groupBy { it.category }
             .map { (cat, list) -> cat to list.sumOf { it.amount } }
             .sortedByDescending { it.second }
@@ -96,7 +96,7 @@ fun StatsScreen(
                 Icon(
                     imageVector = category.icon,
                     contentDescription = category.name,
-                    tint = category.color,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -136,7 +136,7 @@ fun StatsScreen(
                 Icon(
                     imageVector = category.icon,
                     contentDescription = category.name,
-                    tint = category.color,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(Modifier.width(8.dp))

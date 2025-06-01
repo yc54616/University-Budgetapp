@@ -6,8 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.universitybudgetapp.ui.screens.HomeScreenContent
 import com.example.universitybudgetapp.ui.screens.AddEntryScreen
+import com.example.universitybudgetapp.ui.screens.NotificationListScreen
 import com.example.universitybudgetapp.ui.screens.SettingsScreen
 import com.example.universitybudgetapp.ui.screens.StatsScreen
+import com.example.universitybudgetapp.viewmodel.NotificationViewModel
 import java.time.YearMonth
 
 @Composable
@@ -15,18 +17,20 @@ fun AppNavigation(
     navController: NavHostController,
     currentYearMonth: YearMonth,
     isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit
+    onThemeChange: (Boolean) -> Unit,
+    notificationViewModel: NotificationViewModel
 ) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreenContent(
-                navController      = navController,
-                currentYearMonth   = currentYearMonth   // ← 넘겨주기
+                navController = navController,
+                currentYearMonth = currentYearMonth,
+                notificationViewModel = notificationViewModel  // 여기서 전달
             )
         }
         composable("stats") {
             StatsScreen(
-                currentYearMonth   = currentYearMonth   // ← 넘겨주기
+                currentYearMonth = currentYearMonth
             )
         }
         composable("settings") {
@@ -35,8 +39,17 @@ fun AppNavigation(
                 onThemeChange = onThemeChange
             )
         }
-        composable( "add_entry") { AddEntryScreen(navController = navController) }
+        composable("add_entry") {
+            AddEntryScreen(navController = navController)
+        }
+        composable("notification_list") {
+            NotificationListScreen(
+                navController = navController,
+                notificationViewModel = notificationViewModel
+            )
+        }
     }
 }
+
 
 

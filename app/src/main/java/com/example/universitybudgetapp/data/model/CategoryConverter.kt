@@ -9,8 +9,9 @@ class CategoryConverter {
     fun fromCategory(category: Category): String {
         return when (category) {
             is Category.Custom ->
-                "custom:${category.name}:${category.iconName}:${category.color.value.toLong()}"
-            else -> category.internalId
+                // 🔥 타입 정보 추가 (마지막에 type.name)
+                "custom:${category.name}:${category.iconName}:${category.color.value.toLong()}:${category.type.name}"
+            else -> category.internalId // 기본 카테고리는 internalId로 처리
         }
     }
 
@@ -22,14 +23,21 @@ class CategoryConverter {
                 val name = parts.getOrNull(0) ?: "사용자"
                 val iconName = parts.getOrNull(1) ?: "Category"
                 val colorLong = parts.getOrNull(2)?.toLongOrNull() ?: Color.Gray.value.toLong()
+                val typeName = parts.getOrNull(3) ?: Category.Type.EXPENSE.name // 기본은 EXPENSE
+
                 val icon = Category.iconFromName(iconName)
                 val color = Color(colorLong)
-                Category.Custom(name = name, icon = icon, color = color, iconName = iconName)
+                val type = Category.Type.valueOf(typeName)
+
+                Category.Custom(
+                    name = name,
+                    icon = icon,
+                    color = color,
+                    iconName = iconName,
+                    type = type
+                )
             }
             else -> Category.fromId(serial)
         }
     }
 }
-
-
-
