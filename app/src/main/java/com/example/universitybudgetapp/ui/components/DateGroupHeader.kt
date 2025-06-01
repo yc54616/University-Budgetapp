@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DateGroupHeader(date: String, income: Int, expense: Int) {
+fun DateGroupHeader(date: String, income: Long, expense: Long) {
     Surface(
         tonalElevation = 2.dp,
         color = MaterialTheme.colorScheme.surfaceVariant,

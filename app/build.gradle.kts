@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.localbroadcastmanager)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.appcompat)
