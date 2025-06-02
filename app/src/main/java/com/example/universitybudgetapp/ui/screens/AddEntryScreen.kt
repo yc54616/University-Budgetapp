@@ -92,7 +92,6 @@ fun AddEntryScreen(
         OutlinedTextField(
             value = amount.toLongOrNull()?.let { "%,d".format(it) } ?: "",
             onValueChange = {}, // 입력 막기, 대신 CustomKeypad로만
-            readOnly = true,
             label = { Text("금액") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -242,4 +241,3 @@ fun CustomKeypad(
         }
     }
 }
-

@@ -8,6 +8,7 @@ import com.example.universitybudgetapp.ui.screens.HomeScreenContent
 import com.example.universitybudgetapp.ui.screens.AddEntryScreen
 import com.example.universitybudgetapp.ui.screens.EntryDetailScreen
 import com.example.universitybudgetapp.ui.screens.NotificationListScreen
+import com.example.universitybudgetapp.ui.screens.SelectEntryForRefundScreen
 import com.example.universitybudgetapp.ui.screens.SettingsScreen
 import com.example.universitybudgetapp.ui.screens.StatsScreen
 import com.example.universitybudgetapp.viewmodel.EntryViewModel
@@ -85,9 +86,25 @@ fun AppNavigation(
                 notificationViewModel = notificationViewModel
             )
         }
+        composable("select_entry_for_refund/{notificationId}") { backStackEntry ->
+            val notificationId = backStackEntry.arguments?.getString("notificationId")
+            notificationId?.let { id ->
+                SelectEntryForRefundScreen(
+                    navController = navController,
+                    notificationItemId = id,
+                    entryViewModel = entryViewModel,
+                    notificationViewModel = notificationViewModel,
+                    onRefundProcessed = { entry, refundAmount ->
+                        entryViewModel.processRefund(entry, refundAmount)
+                        notificationViewModel.getNotificationById(id)?.let { notification ->
+                            notificationViewModel.setRecentlyRefunded(entry, refundAmount, notification)
+                            notificationViewModel.removeNotification(notification)
+                        }
+                    }
+                )
+            }
+        }
     }
 }
-
-
 
 

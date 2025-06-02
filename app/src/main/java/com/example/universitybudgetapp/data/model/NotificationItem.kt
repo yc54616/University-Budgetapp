@@ -1,4 +1,3 @@
-// NotificationItem.kt
 package com.example.universitybudgetapp.data.model
 
 import androidx.room.Entity
@@ -13,4 +12,3 @@ data class NotificationItem(
     val amount: Long,       // Int → Long
     val type: String        // 수입/지출 구분
 )
-
