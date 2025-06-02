@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +21,7 @@ import com.example.universitybudgetapp.ui.BudgetApp
 import com.example.universitybudgetapp.ui.theme.UniversityBudgetAppTheme
 import com.example.universitybudgetapp.viewmodel.NotificationViewModel
 import com.example.universitybudgetapp.viewmodel.NotificationViewModelFactory
+import com.example.universitybudgetapp.viewmodel.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -28,27 +30,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1️⃣ DB와 Repository 생성
+        // DB와 Repository 설정
         val database = AppDatabase.getInstance(applicationContext)
         val repository = NotificationRepository(database.notificationDao())
-
-        // 2️⃣ ViewModelFactory로 ViewModel 생성
         val factory = NotificationViewModelFactory(repository)
         notificationViewModel = ViewModelProvider(this, factory)[NotificationViewModel::class.java]
 
-        // 3️⃣ LocalBroadcastManager 등록
+        // BroadcastReceiver 등록
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.let {
-                    val title = it.getStringExtra("title") ?: ""
-                    val description = it.getStringExtra("description") ?: ""
-                    val amount = it.getLongExtra("amount", 0L)  // 수정됨!
-                    val type = it.getStringExtra("type") ?: "기타"  // 추가됨!
                     val item = NotificationItem(
-                        title = title,
-                        description = description,
-                        amount = amount,
-                        type = type
+                        title = it.getStringExtra("title") ?: "",
+                        description = it.getStringExtra("description") ?: "",
+                        amount = it.getLongExtra("amount", 0L),
+                        type = it.getStringExtra("type") ?: "기타"
                     )
                     notificationViewModel.addNotification(item)
                 }
@@ -57,13 +53,15 @@ class MainActivity : ComponentActivity() {
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(receiver, IntentFilter("BANK_NOTIFICATION_EVENT"))
 
-        // 4️⃣ Compose Content
+        // Compose Content
         setContent {
-            var isDarkTheme by remember { mutableStateOf(false) }
+            val themeViewModel: ThemeViewModel = ViewModelProvider(this)[ThemeViewModel::class.java]
+            val isDarkTheme by themeViewModel.isDarkMode.collectAsState()
+
             UniversityBudgetAppTheme(darkTheme = isDarkTheme) {
                 BudgetApp(
                     isDarkTheme = isDarkTheme,
-                    onThemeChange = { isDarkTheme = it },
+                    onThemeChange = { themeViewModel.setDarkMode(it) },
                     notificationViewModel = notificationViewModel
                 )
             }
