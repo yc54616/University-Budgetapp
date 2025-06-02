@@ -39,9 +39,9 @@ fun NotificationListScreen(
 
             val result = snackbarHostState.showSnackbar(
                 message = "${entry.description} 환급 완료",
-                actionLabel = "되돌리기"
+                actionLabel = "되돌리기",
+                duration = SnackbarDuration.Short
             )
-
             if (result == SnackbarResult.ActionPerformed) {
                 entryViewModel.getEntryByIdFromDb(entry.id) { updatedEntry ->
                     updatedEntry?.let { safeEntry ->
