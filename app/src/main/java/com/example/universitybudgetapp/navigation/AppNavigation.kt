@@ -7,6 +7,8 @@ import androidx.navigation.compose.composable
 import com.example.universitybudgetapp.ui.screens.HomeScreenContent
 import com.example.universitybudgetapp.ui.screens.AddEntryScreen
 import com.example.universitybudgetapp.ui.screens.EntryDetailScreen
+import com.example.universitybudgetapp.ui.screens.ExpenseStatsDetailScreen
+import com.example.universitybudgetapp.ui.screens.IncomeStatsDetailScreen
 import com.example.universitybudgetapp.ui.screens.NotificationListScreen
 import com.example.universitybudgetapp.ui.screens.SelectEntryForRefundScreen
 import com.example.universitybudgetapp.ui.screens.SettingsScreen
@@ -64,7 +66,7 @@ fun AppNavigation(
                 )
             }
         }
-        composable("stats") {
+        composable(route = "stats") {
             StatsScreen(
                 currentYearMonth = currentYearMonth,
                 notificationViewModel = notificationViewModel
@@ -103,6 +105,16 @@ fun AppNavigation(
                     }
                 )
             }
+        }
+        composable("income_stats_detail/{yearMonth}") { backStackEntry ->
+            val yearMonthParam = backStackEntry.arguments?.getString("yearMonth")
+            // yearMonthParam -> "2025-06" 형태
+            IncomeStatsDetailScreen(yearMonthParam)
+        }
+
+        composable("expense_stats_detail/{yearMonth}") { backStackEntry ->
+            val yearMonthParam = backStackEntry.arguments?.getString("yearMonth")
+            ExpenseStatsDetailScreen(yearMonthParam)
         }
     }
 }
