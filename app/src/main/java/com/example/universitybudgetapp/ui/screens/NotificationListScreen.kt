@@ -42,8 +42,6 @@ fun NotificationListScreen(
                 actionLabel = "되돌리기",
                 duration = SnackbarDuration.Short
             )
-
-
             if (result == SnackbarResult.ActionPerformed) {
                 entryViewModel.getEntryByIdFromDb(entry.id) { updatedEntry ->
                     updatedEntry?.let { safeEntry ->

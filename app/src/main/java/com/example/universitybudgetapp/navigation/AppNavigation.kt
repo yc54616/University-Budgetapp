@@ -106,19 +106,7 @@ fun AppNavigation(
                 )
             }
         }
-        composable("income_stats_detail/{yearMonth}") { backStackEntry ->
-            val yearMonthParam = backStackEntry.arguments?.getString("yearMonth")
-            // yearMonthParam -> "2025-06" 형태
-            IncomeStatsDetailScreen(yearMonthParam)
-        }
-
-        composable("expense_stats_detail/{yearMonth}") { backStackEntry ->
-            val yearMonthParam = backStackEntry.arguments?.getString("yearMonth")
-            ExpenseStatsDetailScreen(yearMonthParam)
-        }
     }
 }
-
-
 
 

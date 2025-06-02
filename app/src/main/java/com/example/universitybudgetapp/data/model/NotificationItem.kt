@@ -12,4 +12,3 @@ data class NotificationItem(
     val amount: Long,       // Int → Long
     val type: String        // 수입/지출 구분
 )
-
