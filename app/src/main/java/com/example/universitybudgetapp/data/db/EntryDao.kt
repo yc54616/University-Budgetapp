@@ -18,10 +18,10 @@ interface EntryDao {
     @Update
     suspend fun update(entry: Entry)
 
-    // ✅ Entry 단건 삭제 함수 추가
     @Delete
     suspend fun delete(entry: Entry)
+
+    // ✅ Entry 단건 조회 함수 추가
+    @Query("SELECT * FROM entries WHERE id = :id")
+    suspend fun getEntryById(id: Int): Entry?
 }
-
-
-

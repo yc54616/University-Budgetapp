@@ -1,4 +1,3 @@
-// NotificationItem.kt
 package com.example.universitybudgetapp.data.model
 
 import androidx.room.Entity
