@@ -128,7 +128,8 @@ fun NotificationListScreen(
                                     coroutineScope.launch {
                                         val result = snackbarHostState.showSnackbar(
                                             message = "알림이 삭제됨",
-                                            actionLabel = "되돌리기"
+                                            actionLabel = "되돌리기",
+                                            duration = SnackbarDuration.Short
                                         )
                                         if (result == SnackbarResult.ActionPerformed) {
                                             notificationViewModel.addNotification(item)
