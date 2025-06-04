@@ -34,11 +34,10 @@ class UserBankAppViewModel(
         val pm: PackageManager = getApplication<Application>().packageManager
 
         // 2-A) getInstalledApplications으로 모든 앱(ApplicationInfo) 가져오기
-        //     GET_META_DATA를 주면 meta-data까지 로드하지만, 단순히 아이콘/라벨만 필요하면 0으로 해도 무방합니다.
         val installed: List<ApplicationInfo> =
             pm.getInstalledApplications(PackageManager.GET_META_DATA)
 
-        // 2-B) (선택) 로그로 전체 개수와 몇 개 예시를 출력해보기
+        // (원한다면, 로그로 전체 개수를 확인)
         Log.d("AllAppsDebug", "앱 전체 개수(getInstalledApplications): ${installed.size}")
         installed.forEach { appInfo ->
             Log.d(
@@ -47,7 +46,7 @@ class UserBankAppViewModel(
             )
         }
 
-        // 2-C) 앱 이름(라벨) 기준으로 오름차순 정렬
+        // 2-B) 앱 라벨(이름) 기준으로 오름차순 정렬
         val sorted: List<ApplicationInfo> = installed.sortedBy { appInfo ->
             pm.getApplicationLabel(appInfo).toString()
         }
@@ -56,6 +55,7 @@ class UserBankAppViewModel(
     }
 
     // 3) Installed(모든 앱) + Selected(DB에 저장된 패키지명) 을 합쳐서 UI 상태로 제공
+    //    이 부분은 “전체 앱에 대해, DB에 들어있는 패키지인지 아닌지를 isSelected로 표시”하는 역할
     val uiState: StateFlow<List<SelectableAppInfo>> =
         allAppsFlow.combine(selectedPackagesFlow) { installedList, selectedSet ->
             val pm = getApplication<Application>().packageManager
@@ -75,6 +75,7 @@ class UserBankAppViewModel(
             )
 
     // 4) 다이얼로그용 “설치 앱 전체”를 StateFlow로 노출
+    //    SettingsScreen 등에서 이 installedApps를 observe 하여 다이얼로그에 설치된 모든 앱을 표시 가능
     val installedApps: StateFlow<List<ApplicationInfo>> =
         allAppsFlow.stateIn(
             scope = viewModelScope,

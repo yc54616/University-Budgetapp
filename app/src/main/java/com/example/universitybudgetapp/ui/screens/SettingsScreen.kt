@@ -5,7 +5,7 @@ package com.example.universitybudgetapp.ui.screens
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -204,63 +204,140 @@ fun SettingsScreen(
 fun AddBankAppDialog(
     allApps: List<android.content.pm.ApplicationInfo>,
     alreadySelected: Set<String>,
-    packageManager: android.content.pm.PackageManager,   // ← ① PackageManager 파라미터 추가
+    packageManager: android.content.pm.PackageManager,
     onDismiss: () -> Unit,
     onAppSelected: (android.content.pm.ApplicationInfo) -> Unit
 ) {
+    // 1) 실제 검색에 사용할 상태: debouncedQuery
+    //    - searchQuery가 바뀐 뒤 300ms가 지나면 이 값이 업데이트됩니다.
+    var searchQuery by remember { mutableStateOf("") }
+    var debouncedQuery by remember { mutableStateOf("") }
+
+    // 2) searchQuery가 변경될 때마다 이 LaunchedEffect가 실행
+    //    -> delay(300) 후에 가장 최신 searchQuery를 debouncedQuery에 복사
+    LaunchedEffect(searchQuery) {
+        // 검색어가 바뀌면 곧바로 기존 딜레이 작업은 취소됨
+        // 다시 300ms 대기 후 마지막 searchQuery 값을 반영 delay(300)
+        debouncedQuery = searchQuery.trim().lowercase()
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "추가할 앱 선택", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = "추가할 앱 선택",
+                style = MaterialTheme.typography.titleMedium
+            )
         },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
+                // ───────────────────────────────────
+                // 2-1) 안내 텍스트
+                // ───────────────────────────────────
                 Text(
-                    text = "목록에서 추가할 앱을 선택하세요.",
+                    text = "목록에서 추가할 앱을 검색하거나 선택하세요.",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
-                LazyColumn {
-                    // 이미 선택된 패키지는 목록에서 제외
-                    items(items = allApps.filter { !alreadySelected.contains(it.packageName) }) { appInfo ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onAppSelected(appInfo) }  // 클릭 시 콜백
-                                .padding(vertical = 8.dp, horizontal = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // ② 여기서도 LocalContext.current 대신 전달받은 packageManager 사용
-                            val iconDrawable = appInfo.loadIcon(packageManager)
-                            val imageBitmap = remember(iconDrawable) {
-                                (iconDrawable as? BitmapDrawable)?.bitmap
-                                    ?.asImageBitmap()
-                                    ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-                                        .asImageBitmap()
-                            }
+                // ───────────────────────────────────
+                // 2-2) 검색창
+                // ───────────────────────────────────
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    placeholder = { Text(text = "앱 이름 또는 패키지명 검색") },
+                    singleLine = true
+                )
 
-                            Image(
-                                bitmap = imageBitmap,
-                                contentDescription = "앱 아이콘",
-                                modifier = Modifier.size(32.dp)
-                            )
+                // ───────────────────────────────────
+                // 3) 실제 필터링: debouncedQuery 기준으로 필터링
+                //    이미 선택된 앱은 항상 제외
+                // ───────────────────────────────────
+                val filteredApps = remember(allApps, alreadySelected, debouncedQuery) {
+                    allApps.filter { appInfo ->
+                        // 이미 선택된 앱이면 제외
+                        if (alreadySelected.contains(appInfo.packageName)) {
+                            false
+                        } else {
+                            // 앱 라벨과 패키지명을 모두 소문자로 가져옴
+                            val label = packageManager
+                                .getApplicationLabel(appInfo)
+                                .toString()
+                                .lowercase()
+                            val pkg = appInfo.packageName.lowercase()
 
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = packageManager.getApplicationLabel(appInfo).toString(),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                                Text(
-                                    text = appInfo.packageName,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                            // 검색어가 비어 있으면 true, 아니라면 포함 여부 검사
+                            if (debouncedQuery.isEmpty()) {
+                                true
+                            } else {
+                                label.contains(debouncedQuery) || pkg.contains(debouncedQuery)
                             }
                         }
-                        Divider()
+                    }
+                }
+
+                // ───────────────────────────────────
+                // 4) LazyColumn에 filteredApps 표시
+                // ───────────────────────────────────
+                LazyColumn {
+                    if (filteredApps.isEmpty()) {
+                        // 검색 결과가 없을 때 안내 문구
+                        item {
+                            Text(
+                                text = "검색 결과가 없습니다.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    } else {
+                        items(filteredApps, key = { it.packageName }) { appInfo ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onAppSelected(appInfo) }
+                                    .padding(vertical = 8.dp, horizontal = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // 아이콘
+                                val iconDrawable = appInfo.loadIcon(packageManager)
+                                val imageBitmap = remember(iconDrawable) {
+                                    (iconDrawable as? BitmapDrawable)?.bitmap
+                                        ?.asImageBitmap()
+                                        ?: Bitmap.createBitmap(
+                                            1, 1, Bitmap.Config.ARGB_8888
+                                        ).asImageBitmap()
+                                }
+                                Image(
+                                    bitmap = imageBitmap,
+                                    contentDescription = "앱 아이콘",
+                                    modifier = Modifier.size(32.dp)
+                                )
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = packageManager
+                                            .getApplicationLabel(appInfo)
+                                            .toString(),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    Text(
+                                        text = appInfo.packageName,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            Divider()
+                        }
                     }
                 }
             }
@@ -272,6 +349,8 @@ fun AddBankAppDialog(
         }
     )
 }
+
+
 
 /**
  * 은행/금융 앱 토글 아이템 컴포저블 (기존 코드 재사용)
